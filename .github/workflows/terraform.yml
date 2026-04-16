@@ -1,0 +1,53 @@
+name: "Terraform Workflow"
+
+on:
+  workflow_dispatch:
+    inputs:
+      terraform_action:
+        description: 'Select Terraform Action'
+        required: true
+        default: 'plan'
+        type: choice
+        options:
+          - plan
+          - apply
+          - destroy
+
+jobs:
+  plan:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    timeout-minutes: 20  # Automatically kills the job if it gets stuck
+    defaults:
+      run:
+        working-directory: ./infrastructure/modules  # Adjust this path to where your Terraform code is located
+    env:
+      # Map your secrets to environment variables
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Format Check
+        run: terraform fmt
+        continue-on-error: true
+
+      - name: Terraform Plan
+        if: github.event.inputs.terraform_action == 'plan' || github.event.inputs.terraform_action == 'apply'
+        run: terraform plan
+
+      - name: Terraform Apply
+        if: github.event.inputs.terraform_action == 'apply' 
+        run: terraform apply -auto-approve
+
+      - name: Terraform Destroy
+        if: github.event.inputs.terraform_action == 'destroy'
+        run: terraform destroy -auto-approve
