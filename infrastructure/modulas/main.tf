@@ -11,9 +11,9 @@ terraform {
   
   backend "s3" {
     # Update these values according to your setup
-    # bucket = "your-terraform-state-bucket"
-    # key    = "java-app/terraform.tfstate"
-    # region = "us-east-1"
+    bucket = "s3-bakup-devops-project"
+    key    = "java-app/terraform.tfstate"
+    region = "us-east-1"
   }
 }
 
@@ -39,6 +39,23 @@ module "security" {
   environment             = var.environment
   vpc_id                 = module.vpc.vpc_id
   allowed_ssh_cidr_blocks = var.allowed_ssh_cidr_blocks
+}
+
+module "ec2" {
+  source = "./modules/ec2"
+
+  ami_id        = var.ami_id
+  instance_type = var.instance_type
+  key_name      = var.key_name
+
+  # Choose subnet type
+  subnet_id = module.vpc.public_subnet_ids[0]
+  # OR private:
+  # subnet_id = module.vpc.private_subnet_ids[0]
+
+  security_group_ids   = [aws_security_group.ec2_sg.id]
+  associate_public_ip  = true   # false if private subnet
+  environment          = var.environment
 }
 
 # RDS Module
