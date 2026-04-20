@@ -25,10 +25,6 @@ variable "db_name" {
   type        = string
 }
 
-variable "db_username" {
-  description = "Database username"
-  type        = string
-  default = "master"
-}
+variable "db_username" {}
 
 variable "db_password" {}
