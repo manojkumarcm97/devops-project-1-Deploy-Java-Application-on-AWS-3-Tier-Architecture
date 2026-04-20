@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 20  # Automatically kills the job if it gets stuck
     defaults:
       run:
-        working-directory: /infrastructure/modulas  # Adjust this path to where your Terraform code is located
+        working-directory: ./infrastructure/modulas  # Adjust this path to where your Terraform code is located
     env:
       # Map your secrets to environment variables
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
