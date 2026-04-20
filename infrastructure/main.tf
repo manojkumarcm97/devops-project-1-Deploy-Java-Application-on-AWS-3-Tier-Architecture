@@ -41,8 +41,8 @@ module "security" {
   allowed_ssh_cidr_blocks = var.allowed_ssh_cidr_blocks
 }
 
-module "ec2" {
-  source = "./modules/ec2"
+module "bastion_server" {
+  source = "./modules/bastion_server"
 
   ami_id        = var.ami_id
   instance_type = var.instance_type
